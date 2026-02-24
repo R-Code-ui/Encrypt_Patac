@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Custom Key Encryption</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 550px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1em;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        .card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            background: white;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            padding: 14px;
+            background: #f1f5f9;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .checkbox-wrapper:hover {
+            border-color: #4f46e5;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #4f46e5;
+        }
+
+        .checkbox-wrapper label {
+            cursor: pointer;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 1em;
+            flex: 1;
+        }
+
+        .key-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 16px;
+            border: 2px solid #e2e8f0;
+            display: none;
+        }
+
+        .key-section.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .key-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .key-input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.95em;
+            background: #f8fafc;
+            font-family: 'Courier New', monospace;
+        }
+
+        .key-input-group input:focus {
+            border-color: #4f46e5;
+            background: white;
+        }
+
+        .generated-key {
+            background: #4f46e5;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            word-break: break-all;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 14px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+            width: auto;
+            padding: 12px 20px;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .output-section {
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .output-section label {
+            display: block;
+            margin-bottom: 10px;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .output-box {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            min-height: 70px;
+            color: #1e293b;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .copy-btn {
+            background: white;
+            color: #4f46e5;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid #4f46e5;
+            flex: 1;
+            text-align: center;
+        }
+
+        .copy-btn:hover {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+            margin: 25px 0;
+        }
+
+        .footer {
+            text-align: center;
+            color: #64748b;
+            margin-top: 20px;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="notification" id="notification">Copied to clipboard!</div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Custom Key Encryption</h1>
+            <p>Encrypt and decrypt with your own secret key</p>
+        </div>
+
+        <div class="content">
+            <div class="card">
+                <div class="input-group">
+                    <label>Text to Encrypt</label>
+                    <input type="text" id="textToEncrypt" placeholder="e.g., Pikachu">
+                </div>
+
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="encryptKeyCheckbox" onchange="toggleEncryptKey()">
+                    <label for="encryptKeyCheckbox">Encrypt with a custom secret key</label>
+                </div>
+
+                <div class="key-section" id="encryptKeySection">
+                    <div class="key-input-group">
+                        <input type="text" id="secretKey" placeholder="Enter or generate secret key" readonly>
+                        <button class="btn btn-secondary" onclick="generateKey()">Generate</button>
+                    </div>
+                    <div id="generatedKeyDisplay" class="generated-key" style="display: none;"></div>
+                </div>
+
+                <button class="btn btn-primary" onclick="encrypt()">
+                    <span>🔒</span> Encrypt
+                </button>
+
+                <div class="output-section">
+                    <label>Encrypted Output</label>
+                    <div class="output-box" id="encryptedOutput">Click Encrypt to see result</div>
+                    <div class="action-buttons">
+                        <div class="copy-btn" onclick="copyToClipboard('encryptedOutput', 'decryptInput')">
+                            📋 Copy to Decrypt
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="input-group">
+                    <label>Text to Decrypt</label>
+                    <input type="text" id="decryptInput" placeholder="Paste encrypted text here">
+                </div>
+
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="decryptKeyCheckbox" onchange="toggleDecryptKey()">
+                    <label for="decryptKeyCheckbox">Decryption requires a custom secret key</label>
+                </div>
+
+                <div class="key-section" id="decryptKeySection">
+                    <div class="key-input-group">
+                        <input type="text" id="decryptSecretKey" placeholder="Enter the same secret key">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="decrypt()">
+                    <span>🔓</span> Decrypt
+                </button>
+
+                <div class="output-section">
+                    <label>Decrypted Result</label>
+                    <div class="output-box" id="decryptedOutput">Decrypted text will appear here</div>
+                </div>
+
+                <div class="footer">
+                    ⚡ AES-GCM encryption · Web Crypto API
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_KEY = "MySecretKey123!@#";
+        
+        function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+
+        function copyToClipboard(sourceId, targetId) {
+            const sourceElement = document.getElementById(sourceId);
+            const text = sourceElement.innerText;
+            
+            if (text && text !== 'Click Encrypt to see result') {
+                navigator.clipboard.writeText(text).then(() => {
+                    showNotification();
+                    document.getElementById(targetId).value = text;
+                });
+            }
+        }
+
+        function toggleEncryptKey() {
+            const checkbox = document.getElementById('encryptKeyCheckbox');
+            const keySection = document.getElementById('encryptKeySection');
+            
+            if (checkbox.checked) {
+                keySection.classList.add('visible');
+            } else {
+                keySection.classList.remove('visible');
+                document.getElementById('secretKey').value = '';
+                document.getElementById('generatedKeyDisplay').style.display = 'none';
+            }
+        }
+
+        function toggleDecryptKey() {
+            const checkbox = document.getElementById('decryptKeyCheckbox');
+            const keySection = document.getElementById('decryptKeySection');
+            
+            if (checkbox.checked) {
+                keySection.classList.add('visible');
+            } else {
+                keySection.classList.remove('visible');
+            }
+        }
+
+        function generateKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let key = '';
+            for (let i = 0; i < 16; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('secretKey').value = key;
+            
+            const display = document.getElementById('generatedKeyDisplay');
+            display.textContent = `Generated Key: ${key}`;
+            display.style.display = 'block';
+        }
+
+        function strToArrayBuffer(str) {
+            return new TextEncoder().encode(str);
+        }
+
+        function arrayBufferToBase64(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binary = atob(base64);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        async function deriveKey(password, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                enc.encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveBits', 'deriveKey']
+            );
+            
+            return crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+        }
+
+        async function encrypt() {
+            const text = document.getElementById('textToEncrypt').value;
+            const useCustomKey = document.getElementById('encryptKeyCheckbox').checked;
+            
+            if (!text) {
+                alert('Please enter text to encrypt');
+                return;
+            }
+
+            let keyString;
+            if (useCustomKey) {
+                keyString = document.getElementById('secretKey').value;
+                if (!keyString) {
+                    alert('Please generate or enter a custom key');
+                    return;
+                }
+            } else {
+                keyString = DEFAULT_KEY;
+            }
+
+            try {
+                const salt = crypto.getRandomValues(new Uint8Array(16));
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                
+                const key = await deriveKey(keyString, salt);
+                
+                const encrypted = await crypto.subtle.encrypt(
+                    {
+                        name: 'AES-GCM',
+                        iv: iv
+                    },
+                    key,
+                    strToArrayBuffer(text)
+                );
+
+                const result = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
+                result.set(salt);
+                result.set(iv, salt.length);
+                result.set(new Uint8Array(encrypted), salt.length + iv.length);
+                
+                document.getElementById('encryptedOutput').innerText = arrayBufferToBase64(result);
+            } catch (error) {
+                alert('Encryption failed: ' + error.message);
+            }
+        }
+
+        async function decrypt() {
+            const encryptedText = document.getElementById('decryptInput').value;
+            const useCustomKey = document.getElementById('decryptKeyCheckbox').checked;
+            
+            if (!encryptedText) {
+                alert('Please paste encrypted text');
+                return;
+            }
+
+            let keyString;
+            if (useCustomKey) {
+                keyString = document.getElementById('decryptSecretKey').value;
+                if (!keyString) {
+                    alert('Please enter the secret key');
+                    return;
+                }
+            } else {
+                keyString = DEFAULT_KEY;
+            }
+
+            try {
+                const data = base64ToArrayBuffer(encryptedText);
+                
+                const salt = data.slice(0, 16);
+                const iv = data.slice(16, 28);
+                const encrypted = data.slice(28);
+                
+                const key = await deriveKey(keyString, new Uint8Array(salt));
+                
+                const decrypted = await crypto.subtle.decrypt(
+                    {
+                        name: 'AES-GCM',
+                        iv: new Uint8Array(iv)
+                    },
+                    key,
+                    encrypted
+                );
+
+                const result = new TextDecoder().decode(decrypted);
+                document.getElementById('decryptedOutput').innerText = result;
+            } catch (error) {
+                document.getElementById('decryptedOutput').innerText = '❌ Decryption failed - wrong key or corrupted data';
+            }
+        }
+    </script>
+</body>
+</html>
